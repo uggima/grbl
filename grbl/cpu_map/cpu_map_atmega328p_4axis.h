@@ -29,21 +29,21 @@
                         +-----+
            +------------| USB |------------+
            |            +-----+            |
-           | [ ]D13/SCK        MISO/D12[ ] |     
-           | [ ]3.3V           MOSI/D11[ ]~|   Motor Enable/PWM
-           | [ ]V.ref     ___    SS/D10[ ]~|   Z Limit  
-RESET      | [ ]A0       / N \       D9[ ]~|   Y Limit  
-X Direction| [ ]A1      /  A  \      D8[ ] |   X Limit
-Y Direction| [ ]A2      \  N  /      D7[ ] |   
-Z Direction| [ ]A3       \_0_/       D6[ ]~|   
-C Direction| [ ]A4/SDA               D5[ ]~|   C Step
-Probe      | [ ]A5/SCL               D4[ ] |   Z Step
-           | [ ]A6              INT1/D3[ ]~|   Y Step
-           | [ ]A7              INT0/D2[ ] |   X Step
+           | [ ]D13  PB5       PB4  D12[ ] |     
+           | [ ]3.3V           PB3  D11[ ]~|   Motor Enable/PWM
+           | [ ]V.ref     ___  PB2  D10[ ]~|   Z Limit  
+RESET      | [ ]A0  PC0  / N \ PB1   D9[ ]~|   Y Limit  
+X Direction| [ ]A1  PC1 /  A  \PB0   D8[ ] |   X Limit
+Y Direction| [ ]A2  PC2 \  N  /PD7   D7[ ] |   
+Z Direction| [ ]A3  PC3  \_0_/ PD6   D6[ ]~|   
+C Direction| [ ]A4  PC4        PD5   D5[ ]~|   C Step
+Probe      | [ ]A5  PC5        PD4   D4[ ] |   Z Step
+           | [ ]A6  ADC6    PD3/INT1/D3[ ]~|   Y Step
+           | [ ]A7  ADC7    PD2/INT0/D2[ ] |   X Step
            | [ ]5V                  GND[ ] |     
-           | [ ]RST                 RST[ ] |     
-           | [ ]GND   5V MOSI GND   TX1[ ] |     
-           | [ ]Vin   [ ] [ ] [ ]   RX1[ ] |     
+           | [ ]RST PC6        PC6  RST[ ] |  
+           | [ ]GND   5V MOSI GND   TX1[ ] |  PB0
+           | [ ]Vin   [ ] [ ] [ ]   RX1[ ] |  PB1
            |          [ ] [ ] [ ]          |
            |          MISO SCK RST         |
            | NANO-V3                       |
