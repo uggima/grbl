@@ -91,7 +91,12 @@ void settings_restore(uint8_t restore_flag) {
 	settings.max_travel[X_AXIS] = (-DEFAULT_X_MAX_TRAVEL);
 	settings.max_travel[Y_AXIS] = (-DEFAULT_Y_MAX_TRAVEL);
 	settings.max_travel[Z_AXIS] = (-DEFAULT_Z_MAX_TRAVEL);    
-
+#if N_AXIS == 4
+	settings.steps_per_mm[C_AXIS] = DEFAULT_C_STEPS_PER_MM;
+	settings.max_rate[C_AXIS] = DEFAULT_C_MAX_RATE;
+	settings.acceleration[C_AXIS] = DEFAULT_C_ACCELERATION;
+	settings.max_travel[C_AXIS] = (-DEFAULT_C_MAX_TRAVEL);
+#endif
 	write_global_settings();
   }
   
@@ -295,13 +300,47 @@ void settings_init() {
   // NOTE: Startup lines are checked and executed by protocol_main_loop at the end of initialization.
 }
 
+#if 1 // #This compiles smaller, and imho looks cleaner than the multi ifs. It may be faster //CHANGEME
+uint8_t step_pin_mask_map[] = { (1<<X_STEP_BIT),
+                                (1<<Y_STEP_BIT),
+                                (1<<Z_STEP_BIT)
+                                #if N_AXIS == 4
+                                  ,(1<<C_STEP_BIT)
+                                #endif
+                                };
+uint8_t get_step_pin_mask(uint8_t axis_idx) { return step_pin_mask_map[axis_idx];}
 
+uint8_t direction_pin_mask_map[] = { (1<<X_DIRECTION_BIT),
+                                     (1<<Y_DIRECTION_BIT),
+                                     (1<<Z_DIRECTION_BIT)
+                                     #if N_AXIS == 4
+                                       ,(1<<C_DIRECTION_BIT)
+                                     #endif
+};
+uint8_t get_direction_pin_mask(uint8_t axis_idx) { return direction_pin_mask_map[axis_idx];}
+
+uint8_t limit_pin_mask_map[] = { (1<<X_LIMIT_BIT),
+                                 (1<<Y_LIMIT_BIT),
+                                 (1<<Z_LIMIT_BIT)
+                                 #if N_AXIS == 4
+                                   ,(1<<C_LIMIT_BIT)
+                                 #endif
+};
+uint8_t get_limit_pin_mask(uint8_t axis_idx) { return limit_pin_mask_map[axis_idx];}
+
+#else
 // Returns step pin mask according to Grbl internal axis indexing.
 uint8_t get_step_pin_mask(uint8_t axis_idx)
 {
   if ( axis_idx == X_AXIS ) { return((1<<X_STEP_BIT)); }
   if ( axis_idx == Y_AXIS ) { return((1<<Y_STEP_BIT)); }
-  return((1<<Z_STEP_BIT));
+ #if N_AXIS == 4
+  if ( axis_idx == Z_AXIS ) 
+ #endif 
+ return((1<<Z_STEP_BIT));
+ #if N_AXIS == 4
+ return((1<<C_STEP_BIT));
+ #endif
 }
 
 
@@ -310,7 +349,13 @@ uint8_t get_direction_pin_mask(uint8_t axis_idx)
 {
   if ( axis_idx == X_AXIS ) { return((1<<X_DIRECTION_BIT)); }
   if ( axis_idx == Y_AXIS ) { return((1<<Y_DIRECTION_BIT)); }
-  return((1<<Z_DIRECTION_BIT));
+  #if N_AXIS == 4
+  if ( axis_idx == Z_AXIS ) 
+  #endif
+  return((1<<Z_DIRECTION_BIT)); 
+  #if N_AXIS == 4
+  return((1<<C_DIRECTION_BIT));
+  #endif
 }
 
 
@@ -319,5 +364,11 @@ uint8_t get_limit_pin_mask(uint8_t axis_idx)
 {
   if ( axis_idx == X_AXIS ) { return((1<<X_LIMIT_BIT)); }
   if ( axis_idx == Y_AXIS ) { return((1<<Y_LIMIT_BIT)); }
-  return((1<<Z_LIMIT_BIT));
+  #if N_AXIS == 4
+  if ( axis_idx == Z_AXIS ) 
+  #endif
+  return((1<<Z_LIMIT_BIT)); 
+  #if N_AXIS == 4
+  return((1<<C_LIMIT_BIT));
+  #endif
 }
