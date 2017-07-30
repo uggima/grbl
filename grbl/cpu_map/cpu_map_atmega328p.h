@@ -22,7 +22,7 @@
    supplied by users, so your results may vary. This cpu_map file serves as a central
    pin mapping settings file for AVR 328p used on the Arduino Uno.  */
 
-/* Revised pinout for mega328 based cpu (nano board in my case for simplicity)
+/* Stock pinout for mega328 based cpu (nano board in my case for simplicity)
                         +-----+
            +------------| USB |------------+
            |            +-----+            |
