@@ -1,6 +1,7 @@
 /*
   stepper.c - stepper motor driver: executes motion plans using stepper motors
   Part of Grbl
+
   Copyright (c) 2011-2015 Sungeun K. Jeon
   Copyright (c) 2009-2011 Simen Svale Skogsrud
   
@@ -8,10 +9,12 @@
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
+
   Grbl is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
+
   You should have received a copy of the GNU General Public License
   along with Grbl.  If not, see <http://www.gnu.org/licenses/>.
 */
@@ -64,7 +67,7 @@ static st_block_t st_block_buffer[SEGMENT_BUFFER_SIZE-1];
 // planner buffer. Once "checked-out", the steps in the segments buffer cannot be modified by 
 // the planner, where the remaining planner block steps still can.
 typedef struct {
-  uint16_t n_step;          // Number of step events to be executed for this segment
+  uint16_t n_step;          // Number of step events to be executed for this segment  
   uint16_t cycles_per_tick; // Step distance traveled per ISR tick, aka step rate.
   uint8_t st_block_index;   // Stepper block data index. Uses this information to execute this segment.
   #ifdef ADAPTIVE_MULTI_AXIS_STEP_SMOOTHING
@@ -78,7 +81,7 @@ static segment_t segment_buffer[SEGMENT_BUFFER_SIZE];
 // Stepper ISR data struct. Contains the running data for the main stepper ISR.
 typedef struct {
   // Used by the bresenham line algorithm
-  uint32_t counter[N_AXIS];        // Counter variables for the bresenham line tracer
+  uint32_t counter[N_AXIS];        // Counter variables for the bresenham line tracer Array might not be as good?  /*uint32_t counter_x,counter_y,counter_z;*/
   #ifdef STEP_PULSE_DELAY
     uint8_t step_bits;  // Stores out_bits output to complete the step pulse delay
   #endif
@@ -159,6 +162,7 @@ static st_prep_t prep;
   stepper algorithm and consists of only 7 possible types of profiles: cruise-only, cruise-
   deceleration, acceleration-cruise, acceleration-only, deceleration-only, full-trapezoid, and 
   triangle(no cruise).
+
                                         maximum_speed (< nominal_speed) ->  + 
                     +--------+ <- maximum_speed (= nominal_speed)          /|\                                         
                    /          \                                           / | \                      
@@ -183,8 +187,8 @@ static st_prep_t prep;
 void st_wake_up() 
 {
   // Enable stepper drivers.
-  if (bit_istrue(settings.flags,BITFLAG_INVERT_ST_ENABLE)) { STEPPERS_DISABLE_PORT |= (1<<STEPPERS_DISABLE_BIT); }
-  else { STEPPERS_DISABLE_PORT &= ~(1<<STEPPERS_DISABLE_BIT); }
+//  if (bit_istrue(settings.flags,BITFLAG_INVERT_ST_ENABLE)) { STEPPERS_DISABLE_PORT |= (1<<STEPPERS_DISABLE_BIT); }
+//  else { STEPPERS_DISABLE_PORT &= ~(1<<STEPPERS_DISABLE_BIT); }
 
   if (sys.state & (STATE_CYCLE | STATE_HOMING)){
     // Initialize stepper output bits
@@ -218,15 +222,15 @@ void st_go_idle()
   
   // Set stepper driver idle state, disabled or enabled, depending on settings and circumstances.
   bool pin_state = false; // Keep enabled.
-  if (((settings.stepper_idle_lock_time != 0xff) || sys.rt_exec_alarm) && sys.state != STATE_HOMING) {
+  if (((settings.stepper_idle_lock_time != 0xff) || sys_rt_exec_alarm) && sys.state != STATE_HOMING) {
     // Force stepper dwell to lock axes for a defined amount of time to ensure the axes come to a complete
     // stop and not drift from residual inertial forces at the end of the last movement.
     delay_ms(settings.stepper_idle_lock_time);
     pin_state = true; // Override. Disable steppers.
   }
   if (bit_istrue(settings.flags,BITFLAG_INVERT_ST_ENABLE)) { pin_state = !pin_state; } // Apply pin invert.
-  if (pin_state) { STEPPERS_DISABLE_PORT |= (1<<STEPPERS_DISABLE_BIT); }
-  else { STEPPERS_DISABLE_PORT &= ~(1<<STEPPERS_DISABLE_BIT); }
+//  if (pin_state) { STEPPERS_DISABLE_PORT |= (1<<STEPPERS_DISABLE_BIT); }
+//  else { STEPPERS_DISABLE_PORT &= ~(1<<STEPPERS_DISABLE_BIT); }
 }
 
 
@@ -327,7 +331,7 @@ ISR(TIMER1_COMPA_vect)
         st.counter[Y_AXIS] = st.counter[Z_AXIS] = st.counter[X_AXIS] = (st.exec_block->step_event_count >> 1);
         #if N_AXIS==4
           st.counter[C_AXIS] = st.counter[X_AXIS];
-        #endif
+        #endif   //st.counter_x = st.counter_y = st.counter_z = (st.exec_block->step_event_count >> 1);
       }
       st.dir_outbits = st.exec_block->direction_bits ^ dir_port_invert_mask; 
 
@@ -340,7 +344,7 @@ ISR(TIMER1_COMPA_vect)
           st.steps[C_AXIS] = st.exec_block->steps[C_AXIS] >> st.exec_segment->amass_level;
         #endif
         //TODO: compare size/speed of for(i=0..N_AXIS]) loop
-      #else
+        #else
         //otherwise, just use the block counters directly
         st.steps = st.exec_block->steps;
       #endif
@@ -348,7 +352,7 @@ ISR(TIMER1_COMPA_vect)
     } else {
       // Segment buffer empty. Shutdown.
       st_go_idle();
-      bit_true_atomic(sys.rt_exec_state,EXEC_CYCLE_STOP); // Flag main program for cycle end
+      bit_true_atomic(sys_rt_exec_state,EXEC_CYCLE_STOP); // Flag main program for cycle end
       return; // Nothing to do but exit.
     }  
   }
@@ -361,28 +365,28 @@ ISR(TIMER1_COMPA_vect)
   st.step_outbits = 0; 
 
   // Execute step displacement profile by Bresenham line algorithm
-  st.counter[X_AXIS] += st.steps[X_AXIS];
-
-  if (st.counter[X_AXIS] > st.exec_block->step_event_count) {
-    st.step_outbits |= (1<<X_STEP_BIT);
+	st.counter[X_AXIS] += st.steps[X_AXIS];
+	
+	if (st.counter[X_AXIS] > st.exec_block->step_event_count) 
+	{st.step_outbits |= (1<<X_STEP_BIT);
     st.counter[X_AXIS] -= st.exec_block->step_event_count;
     if (st.exec_block->direction_bits & (1<<X_DIRECTION_BIT)) { sys.position[X_AXIS]--; }
     else { sys.position[X_AXIS]++; }
   }
   
-  st.counter[Y_AXIS] += st.steps[Y_AXIS];
-
-  if (st.counter[Y_AXIS] > st.exec_block->step_event_count) {
-    st.step_outbits |= (1<<Y_STEP_BIT);
+    st.counter[Y_AXIS] += st.steps[Y_AXIS];
+  
+    if (st.counter[Y_AXIS] > st.exec_block->step_event_count)
+	{st.step_outbits |= (1<<Y_STEP_BIT);
     st.counter[Y_AXIS] -= st.exec_block->step_event_count;
     if (st.exec_block->direction_bits & (1<<Y_DIRECTION_BIT)) { sys.position[Y_AXIS]--; }
     else { sys.position[Y_AXIS]++; }
   }
   
-  st.counter[Z_AXIS] += st.steps[Z_AXIS];
-
-  if (st.counter[Z_AXIS] > st.exec_block->step_event_count) {
-    st.step_outbits |= (1<<Z_STEP_BIT);
+    st.counter[Z_AXIS] += st.steps[Z_AXIS];
+  
+    if (st.counter[Z_AXIS] > st.exec_block->step_event_count)
+	{st.step_outbits |= (1<<Z_STEP_BIT);
     st.counter[Z_AXIS] -= st.exec_block->step_event_count;
     if (st.exec_block->direction_bits & (1<<Z_DIRECTION_BIT)) { sys.position[Z_AXIS]--; }
     else { sys.position[Z_AXIS]++; }
@@ -465,8 +469,8 @@ void st_reset()
   st_go_idle();
   
   // Initialize stepper algorithm variables.
-  memset(&prep, 0, sizeof(prep));
-  memset(&st, 0, sizeof(st));
+  memset(&prep, 0, sizeof(st_prep_t));
+  memset(&st, 0, sizeof(stepper_t));
   st.exec_segment = NULL;
   pl_block = NULL;  // Planner block pointer used by segment buffer
   segment_buffer_tail = 0;
@@ -487,7 +491,7 @@ void stepper_init()
 {
   // Configure step and direction interface pins
   STEP_DDR |= STEP_MASK;
-  STEPPERS_DISABLE_DDR |= 1<<STEPPERS_DISABLE_BIT;
+  //STEPPERS_DISABLE_DDR |= 1<<STEPPERS_DISABLE_BIT;
   DIRECTION_DDR |= DIRECTION_MASK;
 
   // Configure Timer 1: Stepper Driver Interrupt
@@ -521,6 +525,7 @@ void st_update_plan_block_parameters()
 
 
 /* Prepares step segment buffer. Continuously called from main program. 
+
    The segment buffer is an intermediary buffer interface between the execution of steps
    by the stepper algorithm and the velocity profiles generated by the planner. The stepper
    algorithm only executes steps within the segment buffer and is filled by the main program
@@ -560,8 +565,8 @@ void st_prep_buffer()
         // segment buffer finishes the prepped block, but the stepper ISR is still executing it. 
         st_prep_block = &st_block_buffer[prep.st_block_index];
         st_prep_block->direction_bits = pl_block->direction_bits;
-
-        // With AMASS enabled, simply bit-shift multiply all Bresenham data by the max AMASS 
+        
+		// With AMASS enabled, simply bit-shift multiply all Bresenham data by the max AMASS 
         // level, such that we never divide beyond the original data anywhere in the algorithm.
         // If the original data is divided, we can lose a step from integer roundoff.
         // With AMASS disabled, `<< 0` is a no-op and is compiled out; use original counts.

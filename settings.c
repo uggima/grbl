@@ -323,7 +323,7 @@ uint8_t limit_pin_mask_map[] = { (1<<X_LIMIT_BIT),
                                  (1<<Y_LIMIT_BIT),
                                  (1<<Z_LIMIT_BIT)
                                  #if N_AXIS == 4
-                                   ,(1<<C_LIMIT_BIT)
+                                  // ,(1<<C_LIMIT_BIT)
                                  #endif
 };
 uint8_t get_limit_pin_mask(uint8_t axis_idx) { return limit_pin_mask_map[axis_idx];}
@@ -372,3 +372,4 @@ uint8_t get_limit_pin_mask(uint8_t axis_idx)
   return((1<<C_LIMIT_BIT));
   #endif
 }
+#endif
