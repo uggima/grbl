@@ -22,7 +22,34 @@
 /* Grbl officially supports the Arduino Uno, but the other supplied pin mappings are
    supplied by users, so your results may vary. This cpu_map file serves as a central
    pin mapping settings file for AVR 328p used on the Arduino Uno.  */
-   
+  
+
+/* Revised pinout for mega328 based cpu (nano board in my case for simplicity)
+
+                        +-----+
+           +------------| USB |------------+
+           |            +-----+            |
+           | [ ]D13/SCK        MISO/D12[ ] |     
+           | [ ]3.3V           MOSI/D11[ ]~|   Motor Enable/PWM
+           | [ ]V.ref     ___    SS/D10[ ]~|   Z Limit  
+RESET      | [ ]A0       / N \       D9[ ]~|   Y Limit  
+X Direction| [ ]A1      /  A  \      D8[ ] |   X Limit
+Y Direction| [ ]A2      \  N  /      D7[ ] |   
+Z Direction| [ ]A3       \_0_/       D6[ ]~|   
+C Direction| [ ]A4/SDA               D5[ ]~|   C Step
+Probe      | [ ]A5/SCL               D4[ ] |   Z Step
+           | [ ]A6              INT1/D3[ ]~|   Y Step
+           | [ ]A7              INT0/D2[ ] |   X Step
+           | [ ]5V                  GND[ ] |     
+           | [ ]RST                 RST[ ] |     
+           | [ ]GND   5V MOSI GND   TX1[ ] |     
+           | [ ]Vin   [ ] [ ] [ ]   RX1[ ] |     
+           |          [ ] [ ] [ ]          |
+           |          MISO SCK RST         |
+           | NANO-V3                       |
+           +-------------------------------+
+         
+         */
 #ifdef GRBL_PLATFORM
 #error "cpu_map already defined: GRBL_PLATFORM=" GRBL_PLATFORM
 #endif
