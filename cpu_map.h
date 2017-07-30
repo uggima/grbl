@@ -28,6 +28,10 @@
 #ifndef cpu_map_h
 #define cpu_map_h
 
+#ifdef CPU_MAP_ATMEGA328P_4AXIS // (Arduino Uno) Officially supported by Grbl.
+  #include "cpu_map/cpu_map_atmega328p_4axis.h"
+  #define N_AXIS 4
+#endif
 
 #ifdef CPU_MAP_ATMEGA328P // (Arduino Uno) Officially supported by Grbl.
   #include "cpu_map/cpu_map_atmega328p.h"
@@ -37,10 +41,7 @@
   #include "cpu_map/cpu_map_atmega2560.h"
 #endif
 
-#ifdef CPU_MAP_ATMEGA328P_4AXIS // (Arduino Uno) Officially supported by Grbl.
-  #include "cpu_map/cpu_map_atmega328p_4axis.h"
-  #define N_AXIS 4
-#endif
+
 
 
 /* 

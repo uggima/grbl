@@ -52,7 +52,7 @@ NC         | [ ]A7              INT0/D2[ ] |   X Step
 #error "cpu_map already defined: GRBL_PLATFORM=" GRBL_PLATFORM
 #endif
 
-
+#error YOU SHOULD NOT SEE THIS MESSAGE! default 328 pinout used
 #define GRBL_PLATFORM "Atmega328p"
 
 // Define serial port pins and interrupt vectors.
