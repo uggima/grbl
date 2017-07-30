@@ -26,7 +26,7 @@
                         +-----+
            +------------| USB |------------+
            |            +-----+            |
-           | [ ]D13/SCK        MISO/D12[ ] |   Z Limit
+Spindle Dir| [ ]D13/SCK        MISO/D12[ ] |   Z Limit
            | [ ]3.3V           MOSI/D11[ ]~|   Motor Enable/PWM
            | [ ]V.ref     ___    SS/D10[ ]~|   Y Limit  
 RESET      | [ ]A0       / N \       D9[ ]~|   X Limit  
