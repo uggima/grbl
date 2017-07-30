@@ -1,4 +1,5 @@
-Rather hacky attempt to add a 4th axis (with no planning, just access to it)
+Rather hacky attempt to add a 4th axis support to ATMEGA328 series of mcu (with no planning support intended, just access to it)
+Based on 0.9j stock and using some code from https://github.com/grbl/grbl/pull/703
 
 ![GitHub Logo](https://github.com/gnea/gnea-Media/blob/master/Grbl%20Logo/Grbl%20Logo%20250px.png?raw=true)
 ***
