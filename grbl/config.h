@@ -398,6 +398,8 @@
 // NOTE: This option has no effect if SOFTWARE_DEBOUNCE is enabled.
 // #define HARD_LIMIT_FORCE_STATE_CHECK // Default disabled. Uncomment to enable.
 
+// I guess this should be in the config too, TODO: check for conditional definition elsewhere
+//#define ADAPTIVE_MULTI_AXIS_STEP_SMOOTHING //CHANGEME
 
 // ---------------------------------------------------------------------------------------
 // COMPILE-TIME ERROR CHECKING OF DEFINE VALUES:
