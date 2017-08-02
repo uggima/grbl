@@ -29,8 +29,8 @@
                         +-----+
            +------------| USB |------------+
            |            +-----+            |
-           | [ ]D13  PB5       PB4  D12[ ] |     
-           | [ ]3.3V           PB3  D11[ ]~|   Motor Enable/PWM
+           | [ ]D13  PB5       PB4  D12[ ] |   Spindle Enable  
+           | [ ]3.3V           PB3  D11[ ]~|   Spindle PWM active low (sinking current)
            | [ ]V.ref     ___  PB2  D10[ ]~|   Z Limit  
 RESET      | [ ]A0  PC0  / N \ PB1   D9[ ]~|   Y Limit  
 X Direction| [ ]A1  PC1 /  A  \PB0   D8[ ] |   X Limit
@@ -70,7 +70,7 @@ Probe      | [ ]A5  PC5        PD4   D4[ ] |   Z Step
 #define C_STEP_BIT      5  // Uno Digital Pin 5
 #define STEP_MASK       ((1<<X_STEP_BIT)|(1<<Y_STEP_BIT)|(1<<Z_STEP_BIT)|(1<<C_STEP_BIT)) // All step bits
 
-// Define step direction output pins. NOTE: All direction pins must be on the same port.
+// Define step direction output pins. NOTE: All direction pins must be on the same port. ///unsure why, but it seems the X and C direction pins get reversed?
 #define DIRECTION_DDR     DDRC
 #define DIRECTION_PORT    PORTC
 #define X_DIRECTION_BIT   1  //A1 // Uno Digital Pin 8
@@ -105,7 +105,7 @@ Probe      | [ ]A5  PC5        PD4   D4[ ] |   Z Step
 #ifdef VARIABLE_SPINDLE 
   #ifdef USE_SPINDLE_DIR_AS_ENABLE_PIN
     // If enabled, spindle direction pin now used as spindle enable, while PWM remains on D11.
-    #define SPINDLE_ENABLE_BIT    5  // Uno Digital Pin 13 (NOTE: D13 can't be pulled-high input due to LED.)
+    #define SPINDLE_ENABLE_BIT    4  // d12            // Uno Digital Pin 13 (NOTE: D13 can't be pulled-high input due to LED.)
   #else
     #define SPINDLE_ENABLE_BIT    3  // Uno Digital Pin 11
   #endif

@@ -47,7 +47,11 @@ void spindle_stop()
 {
   // On the Uno, spindle enable and PWM are shared. Other CPUs have seperate enable pin.
   #ifdef VARIABLE_SPINDLE
+   #ifdef VARIABLE_SPINDLE_INVERTED
+    SPINDLE_PWM_PORT |= (1<<SPINDLE_PWM_BIT);
+   #else
     TCCRA_REGISTER &= ~(1<<COMB_BIT); // Disable PWM. Output voltage is zero.
+   #endif
     #if defined(CPU_MAP_ATMEGA2560) || defined(USE_SPINDLE_DIR_AS_ENABLE_PIN)
       #ifdef INVERT_SPINDLE_ENABLE_PIN
         SPINDLE_ENABLE_PORT |= (1<<SPINDLE_ENABLE_BIT);  // Set pin to high
@@ -98,7 +102,14 @@ void spindle_set_state(uint8_t state, float rpm)
       if (rpm <= 0.0) { spindle_stop(); } // RPM should never be negative, but check anyway.
       else {
         #define SPINDLE_RPM_RANGE (SPINDLE_MAX_RPM-SPINDLE_MIN_RPM)
-        if ( rpm < SPINDLE_MIN_RPM ) { rpm = 0; } 
+        if ( rpm < SPINDLE_MIN_RPM ) { 
+	     #ifndef INVERT_SPINDLE_ENABLE_PIN
+          SPINDLE_ENABLE_PORT &= ~(1<<SPINDLE_ENABLE_BIT);
+         #else
+          SPINDLE_ENABLE_PORT |= (1<<SPINDLE_ENABLE_BIT);
+         #endif
+	     rpm = 0; 
+	    } 
         else { 
           rpm -= SPINDLE_MIN_RPM; 
           if ( rpm > SPINDLE_RPM_RANGE ) { rpm = SPINDLE_RPM_RANGE; } // Prevent integer overflow
@@ -106,9 +117,18 @@ void spindle_set_state(uint8_t state, float rpm)
         current_pwm = floor( rpm*(PWM_MAX_VALUE/SPINDLE_RPM_RANGE) + 0.5);
         #ifdef MINIMUM_SPINDLE_PWM
           if (current_pwm < MINIMUM_SPINDLE_PWM) { current_pwm = MINIMUM_SPINDLE_PWM; }
-        #endif
-        OCR_REGISTER = current_pwm; // Set PWM pin output
-    
+        #endif 
+		#ifdef VARIABLE_SPINDLE_INVERTED
+		 #ifdef CPU_MAP_ATMEGA2560
+		 #error CPU_MAP_ATMEGA2560 + VARIABLE_SPINDLE_INVERTED defined, unsupported
+		 #endif
+		 #warning VARIABLE_SPINDLE_INVERTED defined
+		 current_pwm = 255 - current_pwm;
+		 OCR_REGISTER = current_pwm; // Set PWM pin output
+		#else
+         OCR_REGISTER = current_pwm; // Set PWM pin output
+		#endif
+	
         // On the Uno, spindle enable and PWM are shared, unless otherwise specified.
         #if defined(CPU_MAP_ATMEGA2560) || defined(USE_SPINDLE_DIR_AS_ENABLE_PIN) 
           #ifdef INVERT_SPINDLE_ENABLE_PIN
